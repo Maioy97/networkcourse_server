@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace HTTPServer
 {
@@ -21,19 +22,25 @@ namespace HTTPServer
 
     class Request
     {
-        string[] requestLines;
+        string requestString;
         RequestMethod method;
         public string relativeURI;
+        HTTPVersion httpVersion;
+        string[] requestLines;  
+        string[] contentLines;
+        // atri value
         Dictionary<string, string> headerLines;
+
+        //
+        string[] splitRequestString;
+        int index_splitRequestString;
 
         public Dictionary<string, string> HeaderLines
         {
             get { return headerLines; }
         }
 
-        HTTPVersion httpVersion;
-        string requestString;
-        string[] contentLines;
+        
 
         public Request(string requestString)
         {
@@ -48,19 +55,55 @@ namespace HTTPServer
             throw new NotImplementedException();
 
             //TODO: parse the receivedRequest using the \r\n delimeter   
-
+            splitRequestString = Regex.Split(requestString, "\r\n");
+   
             // check that there is atleast 3 lines: Request line, Host Header, Blank line (usually 4 lines with the last empty line for empty content)
-
-            // Parse Request line
-
-            // Validate blank line exists
-
-            // Load header lines into HeaderLines dictionary
+            if (splitRequestString.Count() >= 3)
+            {
+                // Parse Request line
+               bool x = this.ParseRequestLine();
+                // Validate blank line exists
+               bool y = this.ValidateBlankLine();
+                // Load header lines into HeaderLines dictionary
+               bool z = this.LoadHeaderLines();
+               return x && y && z;
+            }
+            else
+                return false;
         }
 
         private bool ParseRequestLine()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            string [] req_line;
+            string[] uri;
+            req_line = splitRequestString[0].Split(' ');
+
+            if (req_line[1].ToLower() == "get")
+                this.method = RequestMethod.GET;
+            else if (req_line[1].ToLower() == "head")
+                this.method = RequestMethod.HEAD;
+            else if (req_line[1].ToLower() == "post")
+                this.method = RequestMethod.POST;
+            else
+                return false;
+
+            uri = req_line[1].Split('/');
+            this.relativeURI = uri[3];
+
+            if (ValidateIsURI(req_line[1]) != true)
+                return false;
+
+            if (req_line[2].ToLower() == "http09")
+                this.httpVersion = HTTPVersion.HTTP09;
+            else if (req_line[2].ToLower() == "http10")
+                this.httpVersion = HTTPVersion.HTTP10;
+            else if (req_line[2].ToLower() == "http11")
+                this.httpVersion = HTTPVersion.HTTP11;
+            else
+                return false;
+
+            return true;
         }
 
         private bool ValidateIsURI(string uri)
@@ -70,13 +113,46 @@ namespace HTTPServer
 
         private bool LoadHeaderLines()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            string[] substrings;
+            index_splitRequestString = 1;
+            for (; splitRequestString[index_splitRequestString] != "\r\n"; index_splitRequestString++)
+            {
+                substrings = splitRequestString[index_splitRequestString].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                this.requestLines[index_splitRequestString - 1] = splitRequestString[index_splitRequestString];
+                this.headerLines.Add(substrings[0], substrings[1]);
+            }
+            if (index_splitRequestString == 1 && this.httpVersion == HTTPVersion.HTTP10)
+                return true;
+            else if (index_splitRequestString > 1)
+            {
+                index_splitRequestString++;
+                return true;
+            }
+            else
+                return false;
         }
 
         private bool ValidateBlankLine()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            return(splitRequestString.Contains("\r\n"));            
         }
+
+        // not exist in temp
+        /*
+        private bool ValidatecontentLines()
+        {
+            for (int i = 0; index_splitRequestString < splitRequestString.Count(); i++)
+            {
+                this.contentLines[i] = splitRequestString[index_splitRequestString];
+                index_splitRequestString++;
+            }
+            if (contentLines.Count() != 0 && this.method == RequestMethod.POST)
+                return false;
+            else
+                return true;
+        }*/
 
     }
 }
