@@ -26,15 +26,19 @@ namespace HTTPServer
         }
 
         public void StartServer()
-        {
-            Thread thread = new Thread(new ParameterizedThreadStart(this.HandleConnection));
+        {  
             // TODO: Listen to connections, with large backlog.
             serverSocket.Listen(maxconnection);
             // TODO: Accept connections in while loop and start a thread for each connection on function "Handle Connection"
             while (true)
             {
                 //TODO: accept connections and start thread for each accepted connection.
-                thread.Start(serverSocket.Accept());
+                Socket clientSocket = serverSocket.Accept();
+                Console.WriteLine("New client accepted: {0}", clientSocket.RemoteEndPoint);
+
+                Thread thread = new Thread(new ParameterizedThreadStart(this.HandleConnection));
+                thread.Start(clientSocket);
+              
             }
         }
 
@@ -42,26 +46,28 @@ namespace HTTPServer
         {
 
             // TODO: Create client socket 
-            // set client socket ReceiveTimeout = 0 to indicate an infinite time-out period
             Socket clientsoc = (Socket)obj;
+            // set client socket ReceiveTimeout = 0 to indicate an infinite time-out period
             clientsoc.ReceiveTimeout = 0;
-            int size = 0;
+            int receivedLength = 0;
+            byte[] message = new byte[1024];
             // TODO: receive requests in while true until remote client closes the socket.
             while (true)
             {
                 try
-                {
-                    byte[] message = new byte[1024];
+                {                    
                     // TODO: Receive request
-                    size = clientsoc.Receive(message);
+                    receivedLength = clientsoc.Receive(message);
                     // TODO: break the while loop if receivedLen==0
-                    if (size == 0) { break; }
+                    if (receivedLength == 0) { break; }
                     // TODO: Create a Request object using received request string
-                    Request req = new Request(Encoding.ASCII.GetString(message, 0, size));
+                    Request req = new Request(Encoding.ASCII.GetString(message, 0, receivedLength));
+                    //Console.WriteLine(Encoding.ASCII.GetString(message, 0, receivedLength));
                     // TODO: Call HandleRequest Method that returns the response
                     Response res = this.HandleRequest(req);
                     // TODO: Send Response back to client
                     message = Encoding.ASCII.GetBytes(res.ResponseString);
+                    //Console.WriteLine(Encoding.ASCII.GetString(message, 0, receivedLength));
                     clientsoc.Send(message);
                 }
                 catch (Exception ex)
@@ -153,7 +159,7 @@ namespace HTTPServer
                 foreach (string line in redirectionline)
                 {
                     string[] uri = line.Split(',');
-                    Configuration.RedirectionRules.Add(uri[0],uri[1]);
+                    Configuration.RedirectionRules = new Dictionary<string, string>() {{ uri[0], uri[1] }};
                 }
             }
             catch (Exception ex)

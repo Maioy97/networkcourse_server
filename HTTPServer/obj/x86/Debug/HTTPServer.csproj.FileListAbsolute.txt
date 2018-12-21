@@ -7,3 +7,8 @@ D:\Redirected Profile\Desktop\fcis\kolya\year 4\git\networks[2018-2019]\HTTPServ
 D:\Redirected Profile\Desktop\fcis\kolya\year 4\git\networks[2018-2019]\HTTPServer\obj\x86\Debug\HTTPServer.csprojResolveAssemblyReference.cache
 D:\Redirected Profile\Desktop\fcis\kolya\year 4\git\networks[2018-2019]\HTTPServer\obj\x86\Debug\HTTPServer.exe
 D:\Redirected Profile\Desktop\fcis\kolya\year 4\git\networks[2018-2019]\HTTPServer\obj\x86\Debug\HTTPServer.pdb
+E:\university\Fourth Year\Networks\the project\HTTPServer\obj\x86\Debug\HTTPServer.exe
+E:\university\Fourth Year\Networks\the project\HTTPServer\obj\x86\Debug\HTTPServer.pdb
+E:\university\Fourth Year\Networks\the project\HTTPServer\obj\x86\Debug\HTTPServer.csprojResolveAssemblyReference.cache
+E:\university\Fourth Year\Networks\the project\HTTPServer\bin\Debug\HTTPServer.exe
+E:\university\Fourth Year\Networks\the project\HTTPServer\bin\Debug\HTTPServer.pdb

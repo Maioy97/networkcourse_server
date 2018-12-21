@@ -29,7 +29,7 @@ namespace HTTPServer
         string[] requestLines;  
         string[] contentLines;
         // atri value
-        Dictionary<string, string> headerLines;
+        Dictionary<string, string> headerLines = new Dictionary<string, string>();
 
         //
         string[] splitRequestString;
@@ -52,7 +52,7 @@ namespace HTTPServer
         /// <returns>True if parsing succeeds, false otherwise.</returns>
         public bool ParseRequest()
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
 
             //TODO: parse the receivedRequest using the \r\n delimeter   
             splitRequestString = Regex.Split(requestString, "\r\n");
@@ -79,26 +79,26 @@ namespace HTTPServer
             string[] uri;
             req_line = splitRequestString[0].Split(' ');
 
-            if (req_line[1].ToLower() == "get")
+            if (req_line[0].ToLower() == "get")
                 this.method = RequestMethod.GET;
-            else if (req_line[1].ToLower() == "head")
+            else if (req_line[0].ToLower() == "head")
                 this.method = RequestMethod.HEAD;
-            else if (req_line[1].ToLower() == "post")
+            else if (req_line[0].ToLower() == "post")
                 this.method = RequestMethod.POST;
             else
                 return false;
 
             uri = req_line[1].Split('/');
-            this.relativeURI = uri[3];
+            this.relativeURI = uri[1];
 
             if (ValidateIsURI(req_line[1]) != true)
                 return false;
 
-            if (req_line[2].ToLower() == "http09")
+            if (req_line[2].ToLower() == "http/0.9")
                 this.httpVersion = HTTPVersion.HTTP09;
-            else if (req_line[2].ToLower() == "http10")
+            else if (req_line[2].ToLower() == "http/1.0")
                 this.httpVersion = HTTPVersion.HTTP10;
-            else if (req_line[2].ToLower() == "http11")
+            else if (req_line[2].ToLower() == "http/1.1")
                 this.httpVersion = HTTPVersion.HTTP11;
             else
                 return false;
@@ -116,11 +116,21 @@ namespace HTTPServer
             //throw new NotImplementedException();
             string[] substrings;
             index_splitRequestString = 1;
-            for (; splitRequestString[index_splitRequestString] != "\r\n"; index_splitRequestString++)
+            this.headerLines= new Dictionary<string, string>();
+            for (; splitRequestString[index_splitRequestString] != ""; index_splitRequestString++)
             {
-                substrings = splitRequestString[index_splitRequestString].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
-                this.requestLines[index_splitRequestString - 1] = splitRequestString[index_splitRequestString];
-                this.headerLines.Add(substrings[0], substrings[1]);
+                if (index_splitRequestString == 1)
+                {
+                    int x=splitRequestString[1].Length;
+                    string firstheaderline = splitRequestString[1].Substring(5, splitRequestString[1].Length-5);
+                    substrings = firstheaderline.Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                else
+                {
+                    substrings = splitRequestString[index_splitRequestString].Split(new char[] { ':' }, StringSplitOptions.RemoveEmptyEntries);
+                }
+                //this.requestLines[index_splitRequestString - 1] = splitRequestString[index_splitRequestString];
+                headerLines.Add(substrings[0] , substrings[1]);
             }
             if (index_splitRequestString == 1 && this.httpVersion == HTTPVersion.HTTP10)
                 return true;
@@ -136,7 +146,7 @@ namespace HTTPServer
         private bool ValidateBlankLine()
         {
             //throw new NotImplementedException();
-            return(splitRequestString.Contains("\r\n"));            
+            return(this.requestString.Contains("\r\n"));            
         }
 
         // not exist in temp
