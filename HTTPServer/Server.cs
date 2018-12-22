@@ -90,8 +90,8 @@ namespace HTTPServer
             try
             {
                 //TODO: map the relativeURI in request to get the physical path of the resource.
-                contentpath = Configuration.RootPath + "\\" + request.relativeURI;
                 bool proper_request = request.ParseRequest();
+                contentpath = Configuration.RootPath + "\\" + request.relativeURI;                
                 //TODO: check for bad request 
                 if (!proper_request)
                 {
