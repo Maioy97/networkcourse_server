@@ -119,7 +119,7 @@ namespace HTTPServer
             this.headerLines= new Dictionary<string, string>();
             for (; splitRequestString[index_splitRequestString] != ""; index_splitRequestString++)
             {
-                if (index_splitRequestString == 1)
+                if (index_splitRequestString == 1 && this.httpVersion == HTTPVersion.HTTP11)
                 {
                     int x=splitRequestString[1].Length;
                     string firstheaderline = splitRequestString[1].Substring(5, splitRequestString[1].Length-5);
@@ -146,7 +146,7 @@ namespace HTTPServer
         private bool ValidateBlankLine()
         {
             //throw new NotImplementedException();
-            return(this.requestString.Contains("\r\n"));            
+            return(this.splitRequestString.Contains(""));            
         }
 
         // not exist in temp

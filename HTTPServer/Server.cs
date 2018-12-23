@@ -96,7 +96,7 @@ namespace HTTPServer
                 if (!proper_request)
                 {
                     stC = StatusCode.BadRequest;
-                    contentpath = Configuration.RootPath + '\\' + Configuration.NotFoundDefaultPageName;
+                    contentpath = Configuration.RootPath + '\\' + Configuration.BadRequestDefaultPageName;
 
                 }
 
