@@ -34,7 +34,7 @@ namespace HTTPServer
             {
                 //TODO: accept connections and start thread for each accepted connection.
                 Socket clientSocket = serverSocket.Accept();
-                Console.WriteLine("New client accepted: {0}", clientSocket.RemoteEndPoint);
+                //Console.WriteLine("New client accepted: {0}", clientSocket.RemoteEndPoint);
 
                 Thread thread = new Thread(new ParameterizedThreadStart(this.HandleConnection));
                 thread.Start(clientSocket);
@@ -89,6 +89,7 @@ namespace HTTPServer
             StatusCode stC ;
             try
             {
+                throw new Exception("");
                 //TODO: map the relativeURI in request to get the physical path of the resource.
                 bool proper_request = request.ParseRequest();
                 contentpath = Configuration.RootPath + "\\" + request.relativeURI;                
@@ -106,6 +107,12 @@ namespace HTTPServer
                     stC = StatusCode.Redirect;
                     redirectionpath = Configuration.RedirectionRules[request.relativeURI];
                     contentpath = Configuration.RootPath + "\\" + redirectionpath;
+                    if (!File.Exists(contentpath))
+                    {
+                        redirectionpath = Configuration.RedirectionDefaultPageName;
+                        contentpath = Configuration.RootPath + "\\" + redirectionpath;
+                    }
+                  
                 }
                 //TODO: check file exists
                 else if (File.Exists(contentpath))
